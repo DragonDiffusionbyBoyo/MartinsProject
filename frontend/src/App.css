@@ -1,0 +1,20 @@
+.App {
+  text-align: center;
+}
+
+.menu-node {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.menu-item:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.context-menu {
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

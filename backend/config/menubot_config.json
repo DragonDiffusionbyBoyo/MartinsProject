@@ -1,0 +1,91 @@
+{
+  "ollama": {
+    "base_url": "http://localhost:11434",
+    "timeout": 60,
+    "models": {
+      "primary": "danielsheep/Qwen3-Coder-30B-A3B-Instruct-1M-Unsloth",
+      "vision": "redule26/huihui_ai_qwen2.5-vl-7b-abliterated:latest",
+      "speed": "polaris:latest",
+      "fallback": "qwen3:30b"
+    }
+  },
+  "generation_settings": {
+    "stop": [
+      "<|im_start|>",
+      "<|im_end|>"
+    ],
+    "temperature": 0.7,
+    "min_p": 0.0,
+    "repeat_penalty": 1.05,
+    "top_k": 20,
+    "top_p": 0.8,
+    "max_tokens": 2000,
+    "context_length": 1000000
+  },
+  "task_preferences": {
+    "menu_generation": {
+      "model": "primary",
+      "temperature": 0.3,
+      "max_tokens": 1000
+    },
+    "action_execution": {
+      "model": "primary",
+      "temperature": 0.7,
+      "max_tokens": 2000
+    },
+    "vision_tasks": {
+      "model": "vision",
+      "temperature": 0.5,
+      "max_tokens": 1500
+    },
+    "quick_responses": {
+      "model": "speed",
+      "temperature": 0.5,
+      "max_tokens": 500
+    }
+  },
+  "hardware": {
+    "gpu_type": "cpu",
+    "vram_limit_gb": 24,
+    "enable_gpu_layers": -1,
+    "batch_size": 512
+  },
+  "database": {
+    "path": "database/menubot.db",
+    "backup_enabled": true,
+    "backup_interval_hours": 24
+  },
+  "ui": {
+    "theme": "dark",
+    "auto_save": true,
+    "show_model_info": true,
+    "default_role": "General User"
+  },
+  "media_processing": {
+    "enable_image_processing": true,
+    "enable_video_processing": false,
+    "max_image_size_mb": 10,
+    "supported_formats": [
+      "jpg",
+      "jpeg",
+      "png",
+      "gif",
+      "bmp",
+      "webp"
+    ],
+    "video_formats": [
+      "mp4",
+      "avi",
+      "mov",
+      "webm"
+    ]
+  },
+  "security": {
+    "api_key_required": false,
+    "cors_enabled": true,
+    "allowed_origins": [
+      "*"
+    ],
+    "rate_limit_enabled": false
+  }
+}
