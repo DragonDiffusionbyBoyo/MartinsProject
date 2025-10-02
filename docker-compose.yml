@@ -1,0 +1,155 @@
+#version: '3.9'
+services:
+  db:
+    image: postgres:15
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+      POSTGRES_DB: authdb
+    expose:
+      - "5432:5432"
+    #ports:
+    #  - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      #- ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+      - ./init-multiple-dbs.sql:/docker-entrypoint-initdb.d/init-multiple-dbs.sql:ro
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    expose:
+      - "6379"
+    #ports:
+    #  - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: baines_backend
+    depends_on:
+      - db
+      - redis
+      - ollama
+    #        condition: service_healthy
+    environment:
+      API_KEY: "a ferret"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DATABASE_URL: postgresql://api:apiuser@db:5432/api
+      REDIS_URL: redis://redis:6379/0
+      OLLAMA_BASE_URL: http://ollama:11434
+      #OLLAMA_BASE_URL: http://ollama:11434
+    ports:
+      - "8000:8000"
+    #    volumes:
+    #      - ./backend:/app
+    #      - ./backend/wheelhouse:/wheelhouse
+    #      - ./backend/alembic:/app/alembic
+    #      - ./backend/alembic.ini:/app/alembic.ini
+    command: >
+      sh -c 'uvicorn app.main:app --host 0.0.0.0 --port 8000'
+  frontend:
+    container_name: baines_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80" # map host port 3000 to container port 80 (NGINX)
+    environment:
+      - CHOKIDAR_USEPOLLING=true # optional for file watching on Docker Desktop/WSL
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  #  nginx:
+  #    build: ./nginx
+  #    ports:
+  #      - "80:80"
+  #      - "443:443"
+  #    volumes:
+  #      - ./certbot/www:/var/www/certbot
+  #      - ./certbot/conf:/etc/letsencrypt
+  #      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+  #    depends_on:
+  #      - api
+  #      - authserver
+  #      - fileserver
+  #
+  #  certbot:
+  #    image: certbot/certbot
+  #    volumes:
+  #      - ./certbot/www:/var/www/certbot
+  #      - ./certbot/conf:/etc/letsencrypt
+  #    entrypoint: >
+  #      sh -c "certbot certonly --webroot -w /var/www/certbot
+  #             --email barnard.martin@gmail.com
+  #             --agree-tos
+  #             --no-eff-email
+  #             -d flowize.xyz"
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    # Keep the server running
+    command: ["serve"]
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_NUM_THREADS=4
+    #    deploy:
+    #      resources:
+    #        reservations:
+    #          devices:
+    #            - driver: nvidia
+    #              count: 1
+    #              capabilities: [gpu]
+    # Simple healthcheck (exits non-zero until API responds)
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # Optional one-shot init to pre-pull models on startup
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: ollama_init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-lc"]
+    command: >
+      echo "bob is starting"
+      OLLAMA_HOST=http://ollama:11434
+      ollama pull llama3.2
+      ollama pull mistral
+    # ollama pull "danielsheep/Qwen3-Coder-30B-A3B-Instruct-1M-Unsloth"
+    restart: "no"
+  # Something something docker info
+#  test:
+#    image: nvidia/cuda:12.9.0-base-ubuntu22.04
+#    command: nvidia-smi
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [gpu]
+volumes:
+  ollama:
+  pgdata:
+  redisdata:
