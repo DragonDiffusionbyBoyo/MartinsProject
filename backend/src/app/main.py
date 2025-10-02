@@ -9,9 +9,14 @@ import os
 from datetime import datetime
 import uuid
 
+
+import logging
+
 # Import our custom modules
-from ollama_client import OllamaClient
-from menu_generator import MenuGenerator
+from app.ollama_client import OllamaClient
+from app.menu_generator import MenuGenerator
+
+logger = logging.getLogger()
 
 app = FastAPI(
     title="MenuBot API",
@@ -192,4 +197,4 @@ if __name__ == "__main__":
     print("Starting MenuBot API...")
     print("Available at: http://localhost:8000")
     print("API docs at: http://localhost:8000/docs")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run(app, host="0.0.0.0", port=8000) 
