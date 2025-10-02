@@ -5,7 +5,8 @@ from typing import List, Dict, Any, Optional
 
 class OllamaClient:
     def __init__(self):
-        self.base_url = "http://localhost:11434"
+        self.base_url = "http://ollama:11434"
+        #self.base_url = "http://ollama:11434"
         self.current_model = "danielsheep/Qwen3-Coder-30B-A3B-Instruct-1M-Unsloth"
         self.session = requests.Session()
         self.timeout = 60
@@ -36,9 +37,8 @@ class OllamaClient:
                 return "connected"
             else:
                 return "error"
-        except Exception as e:
+        except Exception as e: 
             return f"offline: {str(e)}"
-    
     async def list_models(self) -> List[Dict[str, Any]]:
         """Get list of available models"""
         try:
@@ -115,8 +115,8 @@ class OllamaClient:
             
         except requests.exceptions.Timeout:
             return "Error: Request timed out. Try using a smaller model."
-        except requests.exceptions.ConnectionError:
-            return "Error: Cannot connect to Ollama. Make sure it's running."
+        except requests.exceptions.ConnectionError as e:
+            return f"Error: Cannot connect to Ollama on {self.base_url}. Make sure it's running. -> {e}"
         except Exception as e:
             print(f"DEBUG: Error in generate_response: {e}")
             return f"Error: {str(e)}"

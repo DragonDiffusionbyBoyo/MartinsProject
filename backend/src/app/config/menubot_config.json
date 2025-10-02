@@ -1,19 +1,16 @@
 {
   "ollama": {
-    "base_url": "http://localhost:11434",
+    "base_url": "http://ollama:11434",
     "timeout": 60,
     "models": {
       "primary": "danielsheep/Qwen3-Coder-30B-A3B-Instruct-1M-Unsloth",
       "vision": "redule26/huihui_ai_qwen2.5-vl-7b-abliterated:latest",
       "speed": "polaris:latest",
-      "fallback": "qwen3:30b"
+      "fallback": "llama3.2"
     }
   },
   "generation_settings": {
-    "stop": [
-      "<|im_start|>",
-      "<|im_end|>"
-    ],
+    "stop": ["<|im_start|>", "<|im_end|>"],
     "temperature": 0.7,
     "min_p": 0.0,
     "repeat_penalty": 1.05,
@@ -65,27 +62,13 @@
     "enable_image_processing": true,
     "enable_video_processing": false,
     "max_image_size_mb": 10,
-    "supported_formats": [
-      "jpg",
-      "jpeg",
-      "png",
-      "gif",
-      "bmp",
-      "webp"
-    ],
-    "video_formats": [
-      "mp4",
-      "avi",
-      "mov",
-      "webm"
-    ]
+    "supported_formats": ["jpg", "jpeg", "png", "gif", "bmp", "webp"],
+    "video_formats": ["mp4", "avi", "mov", "webm"]
   },
   "security": {
     "api_key_required": false,
     "cors_enabled": true,
-    "allowed_origins": [
-      "*"
-    ],
+    "allowed_origins": ["*"],
     "rate_limit_enabled": false
   }
 }

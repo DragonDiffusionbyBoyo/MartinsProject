@@ -1,8 +1,7 @@
 import json
 from typing import List, Dict, Any, Optional
-from ollama_client import OllamaClient
+from app.ollama_client import OllamaClient
 from datetime import datetime
-import os
 
 def debug_log(message, data=None):
     """Write debug info to a file that you can easily check"""

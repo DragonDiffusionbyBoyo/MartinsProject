@@ -1,13 +1,14 @@
 import os
 import json
 from typing import Dict, List, Any
+import subprocess
 
 class MenuBotConfig:
     def __init__(self, config_file: str = "config/menubot_config.json"):
         self.config_file = config_file
         self.default_config = {
             "ollama": {
-                "base_url": "http://localhost:11434",
+                "base_url": "http://ollama:11434",
                 "timeout": 60,
                 "models": {
                     "primary": "danielsheep/Qwen3-Coder-30B-A3B-Instruct-1M-Unsloth",
@@ -163,7 +164,6 @@ class MenuBotConfig:
         """Auto-detect hardware configuration"""
         # Check for NVIDIA GPU via nvidia-ml-py (lightweight) or environment
         try:
-            import subprocess
             result = subprocess.run(['nvidia-smi'], capture_output=True, text=True)
             if result.returncode == 0:
                 return "cuda"
@@ -208,12 +208,6 @@ class MenuBotConfig:
         
         return issues
 
-# Global config instance
-config = MenuBotConfig()
-
-# Hardware detection on import
-config.update_hardware_config()
-
 # Convenience functions
 def get_model_settings(task_type: str = "default") -> Dict[str, Any]:
     return config.get_model_settings(task_type)
@@ -222,4 +216,10 @@ def get_model_for_task(task_type: str) -> str:
     return config.get_model_for_task(task_type)
 
 def get_ollama_url() -> str:
-    return config.get("ollama.base_url", "http://localhost:11434")
+    return config.get("ollama.base_url", "http://ollama:11434")
+# Global config instance
+config = MenuBotConfig()
+
+# Hardware detection on import
+config.update_hardware_config()
+
